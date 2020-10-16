@@ -74,5 +74,4 @@
     path: '{{ db.h2.dir }}/h2_installed'
     owner: '{{ db.h2.user }}'
     mode: '0644'
-    state: file
-    
+    state: touch

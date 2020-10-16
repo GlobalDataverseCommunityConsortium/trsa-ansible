@@ -1,0 +1,52 @@
+---
+
+- name: create payara service account
+  user:
+    name: '{{ trsa.payara.user }}'
+
+- name: payara_dir must exist
+  file:
+    path: '{{ trsa.payara.dir }}'
+    state: directory
+    owner: '{{ trsa.payara.user }}'
+    mode: '0755'
+
+- name: bsdtar can unzip in smarter ways
+  package:
+    name: bsdtar
+
+- name: download payara zip
+  get_url:
+    url: '{{ trsa.payara.zipurl }}'
+    checksum: '{{ trsa.payara.zipchecksum }}'
+    dest: /tmp/payara.zip
+
+- name: unzip to payara root without name/version tld
+  shell: 'bsdtar --strip-components=1 -C {{ trsa.payara.dir }} -xf /tmp/payara.zip'
+  become: true
+  become_method: sudo
+  become_user: '{{ trsa.payara.user }}'
+
+- name: place h2 jar
+  shell: 'cp {{ db.h2.dir }}/bin/*.jar {{ trsa.payara.dir }}/glassfish/lib'
+  become: true
+  become_method: sudo
+  become_user: '{{ trsa.payara.user }}'
+
+- name: place payara systemd unit file
+  template:
+    src: payara.service.j2
+    dest: /usr/lib/systemd/system/payara.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: reload systemd
+  systemd: daemon_reload=true
+
+- name: enable and start payara
+  systemd:
+    name: payara
+    state: started
+    enabled: yes
+

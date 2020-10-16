@@ -10,3 +10,11 @@
 - include: h2.yml
   when: (h2_installed.stat.exists == false) or
         (db.h2.drop_db_if_exists == true)
+
+- name: check for extant payara
+  stat:
+    path: '{{ trsa.payara.dir }}'
+  register: payara_dir
+
+- include: payara.yml
+  when: payara_dir.stat.exists == false
