@@ -5,8 +5,9 @@ After = network.target
 [Service]
 Type = forking
 User = {{ db.h2.user }}
-WorkingDirectory = /opt/h2
-ExecStart = /opt/h2/bin/h2.sh
+WorkingDirectory = {{ db.h2.dir }}
+ExecStart = {{ db.h2.dir }}/bin/h2.sh
+ExecStop = java -cp {{ db.h2.dir }}/bin/h2-1.4.200.jar org.h2.tools.Server -tcpShutdown tcp://localhost:9092 -tcpPassword {{ db.h2.tcpPassword }}
 
 [Install]
 WantedBy = multi-user.target

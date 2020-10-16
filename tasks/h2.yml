@@ -1,5 +1,18 @@
 ---
 
+# TODO: add ExecStop to systemd template
+- name: stop h2 if drop_if_exists
+  systemd:
+    name: h2
+    state: stopped
+  when: db.h2.drop_db_if_exists == true
+
+- name: nuke h2 if drop_if_exists
+  file:
+    path: '{{ db.h2.dir }}'
+    state: absent
+  when: db.h2.drop_db_if_exists == true
+
 - name: create h2 service account
   user:
     name: '{{ db.h2.user }}'
@@ -37,7 +50,7 @@
     path: '{{ db.h2.dir }}/bin/h2.sh'
     backrefs: yes
     regexp: '(^java.*$)'
-    line: '\1 -web -webAllowOthers -tcp -tcpAllowOthers &'
+    line: '\1 -web -webAllowOthers -tcp -tcpAllowOthers -tcpPassword {{ db.h2.tcpPassword }} &'
 
 - name: place systemd template
   template:
@@ -55,3 +68,11 @@
     name: h2
     state: started
     enabled: yes
+
+- name: touch semaphore
+  file:
+    path: '{{ db.h2.dir }}/h2_installed'
+    owner: '{{ db.h2.user }}'
+    mode: '0644'
+    state: file
+    
