@@ -1,0 +1,12 @@
+---
+
+- include: prereqs.yml
+
+- name: check for extant h2
+  stat:
+    path: '{{ db.h2.dir }}/h2_installed'
+  register: h2_installed
+
+- include: h2.yml
+  when: (h2_installed.stat.exists == false) or
+        (db.h2.drop_db_if_exists == true)

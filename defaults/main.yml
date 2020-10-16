@@ -1,0 +1,16 @@
+trsa:
+  branch: jeee8line
+  java:
+    version: 1.8.0
+  payara:
+    dir: /usr/local/payara5
+    zipurl: https://github.com/payara/Payara/releases/download/payara-server-5.2020.5/payara-5.2020.5.zip
+    zipchecksum: sha256:88213d7ee475e5523971e3b7bb43df014f52daa28f1958c7d87af13e07251a3d
+
+db:
+  h2:
+    dir: /opt/h2
+    drop_db_if_exists: false
+    user: h2
+    zipurl: https://h2database.com/h2-2019-10-14.zip
+    zipchecksum: sha256:a72f319f1b5347a6ee9eba42718e69e2ae41e2f846b3475f9292f1e3beb59b01

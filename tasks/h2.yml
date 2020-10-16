@@ -1,0 +1,57 @@
+---
+
+- name: create h2 service account
+  user:
+    name: '{{ db.h2.user }}'
+
+- name: h2 dir must exist
+  file:
+    path: '{{ db.h2.dir }}'
+    state: directory
+    owner: '{{ db.h2.user }}'
+    mode: '0755'
+
+- name: download h2
+  get_url:
+    url: '{{ db.h2.zipurl }}'
+    checksum: '{{ db.h2.zipchecksum }}'
+    dest: /tmp/h2.zip
+
+- name: bsdtar can unzip in smarter ways
+  package:
+    name: bsdtar
+
+- name: unzip h2
+  shell: 'bsdtar --strip-components=1 -C {{ db.h2.dir }} -xf /tmp/h2.zip' 
+  become: true
+  become_method: sudo
+  become_user: '{{ db.h2.user }}'
+
+- name: make bin.sh executable
+  file:
+    path: '{{ db.h2.dir }}/bin/h2.sh'
+    mode: '0755'
+
+- name: tell h2 to listen
+  lineinfile:
+    path: '{{ db.h2.dir }}/bin/h2.sh'
+    backrefs: yes
+    regexp: '(^java.*$)'
+    line: '\1 -web -webAllowOthers -tcp -tcpAllowOthers &'
+
+- name: place systemd template
+  template:
+    src: h2.service.j2
+    dest: /usr/lib/systemd/system/h2.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: reload systemd
+  systemd: daemon_reload=true
+
+- name: enable and start h2
+  systemd:
+    name: h2
+    state: started
+    enabled: yes
