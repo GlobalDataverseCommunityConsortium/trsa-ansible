@@ -32,5 +32,5 @@
 
 - name: ensure we have a few packages
   package:
-    name: ['git', 'java-{{ trsa.java.version }}-openjdk-devel', 'jq', 'maven']
+    name: ['git', 'java-{{ trsa.java.version }}-openjdk-devel', 'jq']
   when: ansible_os_family == "RedHat"

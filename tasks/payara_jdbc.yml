@@ -1,0 +1,13 @@
+---
+
+- name: create JDBC connection pool
+  shell: '{{ trsa.payara.dir }}/bin/asadmin create-jdbc-connection-pool --datasourceclassname org.h2.jdbcx.JdbcDataSource --restype javax.sql.DataSource --property user={{ db.h2.dbuser }}:password={{ db.h2.dbpass }}:url="jdbc\:h2\:tcp\://localhost/~/{{ db.h2.dbname }}" H2TRSAPool'
+  become: true
+  become_method: sudo
+  become_user: '{{ trsa.payara.user }}'
+
+- name: create JDBC resource
+  shell: '{{  trsa.payara.dir }}/bin/asadmin create-jdbc-resource --connectionpoolid H2TRSAPool jdbc/{{ db.h2.dbname }}'
+  become: true
+  become_method: sudo
+  become_user: '{{ trsa.payara.user }}'

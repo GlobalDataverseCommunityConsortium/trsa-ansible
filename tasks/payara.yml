@@ -33,6 +33,27 @@
   become_method: sudo
   become_user: '{{ trsa.payara.user }}'
 
+- name: place jhove.conf
+  get_url:
+    url: 'https://raw.githubusercontent.com/OdumInstitute/trsa-web/master/jhove.conf'
+    dest: '{{ trsa.payara.dir }}/glassfish/domains/domain1/config/jhove.conf'
+    owner: '{{ trsa.payara.user }}'
+    mode: '0644'
+
+- name: place jhoveConfig.xsd
+  get_url:
+    url: 'https://raw.githubusercontent.com/OdumInstitute/trsa-web/master/jhoveConfig.xsd'
+    dest: '{{ trsa.payara.dir }}/glassfish/domains/domain1/config/jhoveConfig.xsd'
+    owner: '{{ trsa.payara.user }}'
+    mode: '0644'
+
+- name: place trsa.config
+  template:
+    src: trsa.config.j2
+    dest: '{{ trsa.payara.dir }}/glassfish/domains/domain1/config/trsa.config'
+    owner: '{{ trsa.payara.user }}'
+    mode: '0644'
+
 - name: place payara systemd unit file
   template:
     src: payara.service.j2

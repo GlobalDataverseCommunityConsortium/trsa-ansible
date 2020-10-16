@@ -18,3 +18,9 @@
 
 - include: payara.yml
   when: payara_dir.stat.exists == false
+
+- include: payara_jdbc.yml
+
+- include: trsa_build.yml
+
+- include: cleanup.yml

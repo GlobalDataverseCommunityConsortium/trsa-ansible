@@ -1,0 +1,41 @@
+---
+
+- name: branch directory must exist
+  file:
+    path: '{{ trsa.srcdir }}'
+    state: directory
+  when: trsa.branch != "release"
+
+- name: clone specified branch
+  git:
+    repo: "{{ trsa.repo }}"
+    dest: "{{ trsa.srcdir }}/{{ trsa.branch }}"
+    version: "{{ trsa.branch }}"
+  when: trsa.branch != "release"
+
+- name: install maven
+  package:
+    name: maven
+
+- name: maven rpm requires openjdk-1.8 but maybe we want newer
+  alternatives:
+    name: '{{ item.name }}'
+    link: '{{ item.link }}'
+    path: '{{ item.path }}'
+  with_items:
+    - { name: 'java', link: '/usr/bin/java', path: '/usr/lib/jvm/java-{{ java.version }}-openjdk/bin/java'}
+    - { name: 'javac', link: '/usr/bin/javac', path: '/usr/lib/jvm/java-{{ java.version }}-openjdk/bin/javac'}
+  when: ansible_os_family == "RedHat" and
+        trsa.java.version != '1.8.0'
+
+- name: build warfile. tail /tmp/jee8line/mvn.out for gory details.
+  shell: "mvn -T 2C package > mvn.out"
+  args:
+    chdir: "{{ trsa.srcdir }}/{{ trsa.branch }}"
+
+- name: deploy warfile
+  shell: '{{ trsa.payara.dir }}/bin/asadmin deploy {{ trsa.srcdir }}/{{ trsa.branch }}/target/trsa-web-{{ trsa.version }}.war'
+  become: true
+  become_method: sudo
+  become_user: '{{ trsa.payara.user }}'
+  

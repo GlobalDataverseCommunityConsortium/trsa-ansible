@@ -1,0 +1,27 @@
+---
+
+- name: stop payara
+  systemd:
+    name: payara
+    state: stopped
+
+- name: stop h2
+  systemd:
+    name: h2
+    state: stopped
+
+- name: revoke ifNotExists
+  replace:
+    path: '{{ db.h2.dir }}/bin/h2.sh'
+    regexp: '-ifNotExists'
+    replace: ''
+
+- name: start h2
+  systemd:
+    name: h2
+    state: started
+
+- name: start payara
+  systemd:
+    name: payara
+    state: started

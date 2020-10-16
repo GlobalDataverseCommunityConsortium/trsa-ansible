@@ -45,12 +45,28 @@
     path: '{{ db.h2.dir }}/bin/h2.sh'
     mode: '0755'
 
-- name: tell h2 to listen
+# ifNotExists is a security hole, but we revoke it once the DB is created.
+# if in the future H2 provides a programmatic method for creating DBs, have at it.
+# once TRSA uses Postgres, H2 will be removed entirely
+- name: tell h2 to listen and create DBs automatically
   lineinfile:
     path: '{{ db.h2.dir }}/bin/h2.sh'
     backrefs: yes
     regexp: '(^java.*$)'
-    line: '\1 -web -webAllowOthers -tcp -tcpAllowOthers -tcpPassword {{ db.h2.tcpPassword }} &'
+    line: '\1 -web -webAllowOthers -tcp -tcpAllowOthers -tcpPassword {{ db.h2.tcpPassword }} -ifNotExists &'
+
+- name: ifNotExists is implemented in Server not Console
+  replace:
+    path: '{{ db.h2.dir }}/bin/h2.sh'
+    regexp: 'Console'
+    replace: 'Server'
+
+- name: place h2.server.properties
+  template:
+    src: '.h2.server.properties.j2'
+    dest: '~{{ db.h2.user }}/.h2.server.properties'
+    owner: '{{ db.h2.user }}'
+    mode: '0644'
 
 - name: place systemd template
   template:
