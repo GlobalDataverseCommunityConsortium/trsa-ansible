@@ -24,3 +24,5 @@
 - include: trsa_build.yml
 
 - include: cleanup.yml
+
+- include: nginx.yml

@@ -31,3 +31,10 @@ db:
     user: h2
     zipurl: https://h2database.com/h2-2019-10-14.zip
     zipchecksum: sha256:a72f319f1b5347a6ee9eba42718e69e2ae41e2f846b3475f9292f1e3beb59b01
+
+nginx:
+  service_fqdn:
+  ssl:
+    enabled: false
+    key:
+    pem:

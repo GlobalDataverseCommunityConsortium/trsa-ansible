@@ -1,0 +1,47 @@
+---
+
+- name: install nginx
+  package:
+    name: nginx
+
+- name: place nginx.conf if no ssl
+  template:
+    src: trsa_no_ssl.conf.j2
+    dest: /etc/nginx/conf.d/trsa.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: nginx.ssl.enabled == false
+
+- name: place nginx.conf if ssl
+  template:
+    src: trsa_ssl.conf.j2
+    dest: /etc/nginx/conf.d/trsa.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: nginx.ssl.enabled == true
+
+- name: place ssl key
+  copy:
+    src: '{{ nginx.ssl.key }}'
+    dest: '/etc/pki/tls/private/{{ nginx.ssl.key }}'
+    owner: root
+    group: root
+    mode: 0600
+  when: nginx.ssl.enabled == true
+
+- name: place ssl pem
+  copy:
+    src: '{{ nginx.ssl.pem }}'
+    dest: '/etc/pki/tls/certs/{{ nginx.ssl.pem }}'
+    owner: root
+    group: root
+    mode: 0644
+  when: nginx.ssl.enabled == true
+
+- name: start and enable nginx
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
