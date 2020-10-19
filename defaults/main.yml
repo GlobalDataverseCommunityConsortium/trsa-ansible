@@ -33,6 +33,10 @@ db:
     zipchecksum: sha256:a72f319f1b5347a6ee9eba42718e69e2ae41e2f846b3475f9292f1e3beb59b01
 
 nginx:
+  htpasswd:
+    enabled: false
+    user: trsa
+    pass: trsatest
   service_fqdn:
   ssl:
     enabled: false

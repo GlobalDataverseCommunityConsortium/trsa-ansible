@@ -30,6 +30,11 @@ server {
     ssl_prefer_server_ciphers on;
 
     location / {
+
+{% if nginx.htpasswd.enabled == true %}
+	auth_basic              "please log in";
+        auth_basic_user_file    /etc/nginx/conf.d/.htpasswd;
+{% endif %}
         proxy_pass              http://localhost:8080;
         proxy_read_timeout      90s;
         proxy_redirect          http://localhost:8080 https://{{ nginx.service_fqdn }};
